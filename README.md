@@ -1,4 +1,16 @@
-# Webpack5
-![CI](https://github.com/Milka79rus/ahj-homeworks-env/actions/workflows/web.yml/badge.svg)
-[Руководство по настройке Webpack](https://webpack.js.org/guides/)
-[Руководство по настройке GitHub Actions](https://docs.github.com/en/actions/quickstart)
+# Домашнее задание "Loading and Sorting" (Data-attributes + Advanced Diff)
+
+[![Netology AHJ](https://github.com/Milka79rus/ahj-dom-sorting/actions/workflows/web.yml/badge.svg)](https://github.com/Milka79rus/ahj-dom-sorting/actions/workflows/web.yml)
+
+##  Описание проекта
+Приложение генерирует интерактивную таблицу фильмов на основе входящих JSON-данных и автоматически сортирует её каждые 2 секунды по разным полям (id, title, year, imdb) как по возрастанию, так и по убыванию.
+
+### Что было реализовано:
+* **Data-атрибуты:** Все данные о фильмах (id, оценки, года) хранятся исключительно в DOM-дереве в виде `data-*` атрибутов. Сортировка происходит на основе чтения этих атрибутов.
+* **Правильное форматирование:** Оценки IMDB всегда выводятся и хранятся с двумя знаками после запятой (`.toFixed(2)`).
+* **Advanced Diff Algorithm:** Вместо полной перерисовки всей таблицы (`innerHTML = ...`), реализован алгоритм сравнения текущего состояния DOM и отсортированного массива. Браузер перемещает элементы точечно с помощью `insertBefore` только тогда, когда это действительно необходимо.
+
+## 🛠 Инфраструктура
+* Сборка: **Webpack 5**
+* Тестирование: **Jest + jsdom environment**
+* CI/CD: **GitHub Actions** с автоматическим деплоем на GitHub Pages.
