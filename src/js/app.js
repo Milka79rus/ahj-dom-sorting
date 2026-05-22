@@ -1,4 +1,5 @@
-document.addEventListener("DOMContentLoaded", () => {
+// 1.  Выносим логику в именованную функцию
+const initMovieTable = () => {
   const moviesData = [
     { id: 26, title: "Побег из Шоушенка", imdb: 9.3, year: 1994 },
     { id: 25, title: "Крёстный отец", imdb: 9.2, year: 1972 },
@@ -22,7 +23,7 @@ document.addEventListener("DOMContentLoaded", () => {
     tr.dataset.id = movie.id;
     tr.dataset.title = movie.title;
     tr.dataset.year = movie.year;
-    tr.dataset.imdb = movie.imdb.toFixed(2); // Всегда два знака после точки
+    tr.dataset.imdb = movie.imdb.toFixed(2);
 
     tr.innerHTML = `
       <td>#${movie.id}</td>
@@ -30,7 +31,9 @@ document.addEventListener("DOMContentLoaded", () => {
       <td>(${movie.year})</td>
       <td>imdb: ${movie.imdb.toFixed(2)}</td>
     `;
-    tbody.appendChild(tr);
+
+    //  Заменили appendChild на append
+    tbody.append(tr);
   });
 
   /* ==========================================================================
@@ -55,7 +58,7 @@ document.addEventListener("DOMContentLoaded", () => {
   function sortTable() {
     const { key, dir } = sortingSequence[currentSortStep];
 
-    //  Извлекаем tr-элементы напрямую из DOM-дерева
+    // Извлекаем tr-элементы напрямую из DOM-дерева
     const currentRowsInDOM = Array.from(tbody.querySelectorAll("tr"));
 
     // Создаем отсортированный массив (это то, как элементы ДОЛЖНЫ стоять)
@@ -95,9 +98,6 @@ document.addEventListener("DOMContentLoaded", () => {
       // Если текущий элемент в DOM не совпадает с целевым, перемещаем его точечно
       if (currentRowInDOM !== targetRow) {
         tbody.insertBefore(targetRow, currentRowInDOM);
-        console.log(
-          `[Diff] Перемещен фильм: "${targetRow.dataset.title}" на индекс ${i}`,
-        );
       }
     }
 
@@ -105,6 +105,13 @@ document.addEventListener("DOMContentLoaded", () => {
     currentSortStep = (currentSortStep + 1) % sortingSequence.length;
   }
 
-  // Запуск бесконечного цикла автоматической сортировки каждые 2 секунды
-  setInterval(sortTable, 2000);
-});
+  // Вынесли "Magic number" в константу
+  const SORT_INTERVAL_MS = 2000;
+
+  //  Сохраняем интервал в переменную
+  // eslint-disable-next-line no-unused-vars
+  const intervalId = setInterval(sortTable, SORT_INTERVAL_MS);
+};
+
+//  Передаем именованную функцию в слушатель
+document.addEventListener("DOMContentLoaded", initMovieTable);
