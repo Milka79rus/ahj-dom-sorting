@@ -1,5 +1,8 @@
-// 1.  Выносим логику в именованную функцию
 const initMovieTable = () => {
+  //  Вынесли ВСЕ магические числа в константы
+  const SORT_INTERVAL_MS = 2000;
+  const IMDB_DECIMAL_PLACES = 2;
+
   const moviesData = [
     { id: 26, title: "Побег из Шоушенка", imdb: 9.3, year: 1994 },
     { id: 25, title: "Крёстный отец", imdb: 9.2, year: 1972 },
@@ -23,16 +26,16 @@ const initMovieTable = () => {
     tr.dataset.id = movie.id;
     tr.dataset.title = movie.title;
     tr.dataset.year = movie.year;
-    tr.dataset.imdb = movie.imdb.toFixed(2);
+    //  Заменили '2' на константу
+    tr.dataset.imdb = movie.imdb.toFixed(IMDB_DECIMAL_PLACES);
 
     tr.innerHTML = `
       <td>#${movie.id}</td>
       <td>${movie.title}</td>
       <td>(${movie.year})</td>
-      <td>imdb: ${movie.imdb.toFixed(2)}</td>
+      <td>imdb: ${movie.imdb.toFixed(IMDB_DECIMAL_PLACES)}</td>
     `;
 
-    //  Заменили appendChild на append
     tbody.append(tr);
   });
 
@@ -40,14 +43,10 @@ const initMovieTable = () => {
      2. НАСТРОЙКА ЦИКЛИЧЕСКОЙ СОРТИРОВКИ 
      ========================================================================== */
   const sortingSequence = [
-    { key: "id", dir: "asc" },
-    { key: "id", dir: "desc" },
-    { key: "title", dir: "asc" },
-    { key: "title", dir: "desc" },
-    { key: "year", dir: "asc" },
-    { key: "year", dir: "desc" },
-    { key: "imdb", dir: "asc" },
-    { key: "imdb", dir: "desc" },
+    { key: "id", dir: "asc" }, { key: "id", dir: "desc" },
+    { key: "title", dir: "asc" }, { key: "title", dir: "desc" },
+    { key: "year", dir: "asc" }, { key: "year", dir: "desc" },
+    { key: "imdb", dir: "asc" }, { key: "imdb", dir: "desc" },
   ];
 
   let currentSortStep = 0;
@@ -57,29 +56,23 @@ const initMovieTable = () => {
      ========================================================================== */
   function sortTable() {
     const { key, dir } = sortingSequence[currentSortStep];
-
-    // Извлекаем tr-элементы напрямую из DOM-дерева
     const currentRowsInDOM = Array.from(tbody.querySelectorAll("tr"));
 
-    // Создаем отсортированный массив (это то, как элементы ДОЛЖНЫ стоять)
     const sortedRows = [...currentRowsInDOM].sort((rowA, rowB) => {
       const valA = rowA.dataset[key];
       const valB = rowB.dataset[key];
 
-      // Числовая сортировка для id, year, imdb
       if (key === "id" || key === "year" || key === "imdb") {
         return dir === "asc"
           ? Number(valA) - Number(valB)
           : Number(valB) - Number(valA);
       }
 
-      // Строковая сортировка для названий (title)
       return dir === "asc"
         ? valA.localeCompare(valB)
         : valB.localeCompare(valA);
     });
 
-    // Визуальное обновление стрелок в шапке таблицы (id ↑, title ↓ и т.д.)
     headers.forEach((th) => {
       th.textContent = th.dataset.sort;
     });
@@ -90,28 +83,21 @@ const initMovieTable = () => {
       activeHeader.textContent += dir === "asc" ? " ↑" : " ↓";
     }
 
-    // РЕАЛИЗАЦИЯ DIFF: Сравниваем реальный DOM и отсортированный массив
     for (let i = 0; i < sortedRows.length; i++) {
-      const targetRow = sortedRows[i]; // Элемент, который должен тут стоять
-      const currentRowInDOM = tbody.children[i]; // Элемент, который сейчас стоит в DOM
+      const targetRow = sortedRows[i];
+      const currentRowInDOM = tbody.children[i];
 
-      // Если текущий элемент в DOM не совпадает с целевым, перемещаем его точечно
       if (currentRowInDOM !== targetRow) {
         tbody.insertBefore(targetRow, currentRowInDOM);
       }
     }
 
-    // Переходим к следующему шагу сортировки в цикле
     currentSortStep = (currentSortStep + 1) % sortingSequence.length;
   }
 
-  // Вынесли "Magic number" в константу
-  const SORT_INTERVAL_MS = 2000;
-
-  //  Сохраняем интервал в переменную
+  // Сохраняем интервал в переменную
   // eslint-disable-next-line no-unused-vars
   const intervalId = setInterval(sortTable, SORT_INTERVAL_MS);
 };
 
-//  Передаем именованную функцию в слушатель
 document.addEventListener("DOMContentLoaded", initMovieTable);
